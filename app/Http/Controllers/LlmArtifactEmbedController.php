@@ -19,10 +19,23 @@ class LlmArtifactEmbedController extends Controller
 //            abort(404);
 //        }
 
+        $checkSecret = false;
+
+        $secret = request()->query('secret');
+
+        if ($checkSecret && empty($secret)) {
+            abort(401, 'No secret provided');
+        }
+
         $artifactId = request()->query('artifactId');
 
         // Make sure the run exists
-        ExtractionRun::findOrFail($runId);
+        /** @var ExtractionRun $run */
+        $run = ExtractionRun::findOrFail($runId);
+
+        if ($checkSecret && $run->getRunSecret() !== $secret) {
+            abort(401, 'Invalid secret');
+        }
 
         $path = str($artifactId)->after('/');
         $pathWithoutExtension = str($path->toString())

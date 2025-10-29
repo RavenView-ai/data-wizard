@@ -1,65 +1,8 @@
-FROM dunglas/frankenphp
-LABEL authors="Lukas Mateffy <hey@mateffy.me>"
+FROM mateffy/data-wizard-python AS python-image
+FROM mateffy/data-wizard-base AS base
 
-RUN install-php-extensions \
-	pdo_sqlite \
-    pdo_pgsql \
-	mbstring \
-    exif \
-	gd \
-	intl \
-	zip \
-	opcache \
-    ffi \
-    imagick \
-    sodium \
-    pcntl \
-    sockets \
-    bcmath
 
-# Install Python "UV" package manager (https://github.com/astral-sh/uv)
-RUN curl -LsSf https://astral.sh/uv/install.sh | sh
-
-# Install libmagic (for Python Mimetype detection)
-RUN apt-get update -y && apt-get install -y \
-    libmagic-dev \
-    unzip \
-    git \
-    unzip \
-    libpq-dev \
-    supervisor \
-    libreoffice \
-    libreoffice-java-common \
-    unoconv \
-    build-essential \
-    pkg-config \
-    libfreetype6-dev \
-    libjpeg-dev \
-    libpng-dev \
-    libopenjp2-7-dev \
-    libtiff-dev \
-    libharfbuzz-dev \
-    libfribidi-dev \
-    libglu1-mesa-dev \
-    libxcursor-dev \
-    libxrandr-dev \
-    libxinerama-dev \
-    libxi-dev \
-    libcairo2-dev \
-    libgirepository1.0-dev \
-    libffi-dev \
-    python3-dev \
-    python3-pip \
-    python3-setuptools \
-    python3-wheel \
-    tesseract-ocr
-
-# Install composer
-RUN curl -sS https://getcomposer.org/installer | php -- --install-dir=/usr/local/bin --filename=composer
-
-# Install bun
-RUN curl -fsSL https://bun.sh/install | bash
-
+## Application specific part
 
 # Copy the application code
 COPY . /app
@@ -77,12 +20,30 @@ RUN php artisan storage:link
 RUN php artisan migrate --force
 RUN #php artisan filament:cache-components
 
-# RUN cd /app/vendor/mateffy/llm-magic/python
-WORKDIR /app/vendor/mateffy/llm-magic/python
-RUN uv add mupdf
+
+# Copy the entire Python environment from the first stage
+COPY --from=python-image /app /app/vendor/mateffy/llm-magic/python
+COPY --from=python-image /app/.venv /app/vendor/mateffy/llm-magic/python/.venv
+COPY --from=python-image /app/.venv/bin/python /app/vendor/mateffy/llm-magic/python/.venv/bin/python
+COPY --from=python-image /usr/local/lib/python3.12/ /usr/local/lib/python3.12/
+COPY --from=python-image /usr/local/lib/libpython3.12.so.1.0 /usr/local/lib/libpython3.12.so.1.0
+#ADD ./expose.pdf /app/expose.pdf
+
+# make sure the output directory exists
+#RUN mkdir -p /app/output
+#
+#WORKDIR /app/vendor/mateffy/llm-magic/python
+#
+## Test that the python script works
+#RUN /app/vendor/mateffy/llm-magic/python/.venv/bin/python prepare-pdf.py /app/output /app/expose.pdf 1233
+
 WORKDIR /app
 
 # Hotfix: OpenAI Gemini Issue: https://github.com/openai-php/client/pull/502
 COPY ./resources/OpenAiPhpHotfixCreateStreamedResponse.php ./vendor/openai-php/client/src/Responses/Chat/CreateStreamedResponse.php
+
+ENV LLM_MAGIC_PYTHON_USE_UV=false
+ENV LLM_MAGIC_PYTHON_CWD=/app/vendor/mateffy/llm-magic/python
+ENV LLM_MAGIC_PYTHON_BIN_PATH=/app/vendor/mateffy/llm-magic/python/.venv/bin/python
 
 ENTRYPOINT ["/usr/bin/supervisord", "-n", "-c", "/etc/supervisor/conf.d/supervisord.conf"]

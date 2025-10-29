@@ -28,6 +28,8 @@ return [
 
     'evaluation_mode' => env('EVALUATION_MODE', false),
 
+    'force_https' => env('FORCE_HTTPS', false),
+
     /*
     |--------------------------------------------------------------------------
     | Application Environment

@@ -13,7 +13,7 @@
 		"ext-fileinfo": "*",
 		"ext-simplexml": "*",
 		"ext-zip": "*",
-		"akaunting/laravel-money": "^5.2",
+		"akaunting/laravel-money": "^6",
 		"api-platform/graphql": "^4",
 		"api-platform/laravel": "^4.1",
 		"archtechx/laravel-seo": "^0.10.3",
@@ -32,7 +32,7 @@
 		"livewire/livewire": "^3.5",
 		"mallardduck/blade-lucide-icons": "^1.23",
 		"mateffy/color": "^1.0",
-		"mateffy/llm-magic": "^1.1",
+		"mateffy/llm-magic": "dev-main",
 		"novadaemon/filament-pretty-json": "^2.2",
 		"nyholm/psr7": "^1.8",
 		"owenvoke/blade-fontawesome": "^2.9",
@@ -115,7 +115,7 @@
     "__repositories": [
         {
 			"type": "path",
-			"url": "../magic/llm-magic"
+			"url": "../llm-magic"
 		}
 	]
 }

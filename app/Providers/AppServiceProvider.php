@@ -11,6 +11,7 @@ use Illuminate\Support\Facades\Route;
 use Illuminate\Support\ServiceProvider;
 use Livewire\Livewire;
 use Mateffy\Magic\Support\ApiTokens\TokenResolver;
+use URL;
 
 class AppServiceProvider extends ServiceProvider
 {
@@ -24,7 +25,9 @@ class AppServiceProvider extends ServiceProvider
      */
     public function boot(): void
     {
-        \URL::forceScheme('https');
+        if (config('app.force_https')) {
+            URL::forceScheme('https');
+        }
 
         // Allow admin access to Laravel Pulse Dashboard
         if ($email = config('app.admin_email')) {
@@ -40,5 +43,7 @@ class AppServiceProvider extends ServiceProvider
         $this->app->bind(TokenResolver::class, function () {
             return new DatabaseTokenResolver();
         });
+
+        putenv('PATH=' . getenv('PATH') . ':/opt/homebrew/bin');
     }
 }

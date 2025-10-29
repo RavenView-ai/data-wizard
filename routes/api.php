@@ -4,6 +4,9 @@ use App\Models\SavedExtractor;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Route;
+use App\Http\Controllers\LlmArtifactEmbedController;
+use App\Http\Controllers\ExtractFileController;
+use App\Http\Controllers\ExtractionStatusController;
 
 /*
 |--------------------------------------------------------------------------
@@ -47,3 +50,15 @@ Route::any('/test/webhook/{extractorId}', function (string $extractorId) {
     ]);
 })
     ->name('test-webhook');
+
+
+Route::post('/extract/{extractorId}/run', ExtractFileController::class)
+    ->middleware(['auth:sanctum'])
+    ->name('api.extractors.runs.create');
+
+Route::get('/extract/{extractorId}/run/{runId}', ExtractionStatusController::class)
+    ->middleware('auth:sanctum')
+    ->name('api.extractors.runs.status');
+
+Route::get('/artifacts/runs/{runId}', LlmArtifactEmbedController::class)
+    ->name('api.artifacts.runs.embed');

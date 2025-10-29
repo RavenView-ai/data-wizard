@@ -13,6 +13,7 @@ services:
       - sqlite_data:/app/database
       - caddy_data:/data
       - caddy_config:/config
+      - /var/run/docker.sock:/var/run/docker.sock  # Mount Docker socket for Docker-in-Docker
     environment:
       - APP_NAME="Data Wizard 🪄"
       - APP_KEY=base64:aOiAgUH1E020+/W41SmdYP1kBjNegIieW9rhDCANoZA=

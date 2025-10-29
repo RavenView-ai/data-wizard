@@ -91,3 +91,4 @@ Route::get('/embed/{extractorId}', function (string $extractorId) {
 // The full page extractor route is used to show the extractor in a full page.
 Route::get('/full-page/{extractorId}', EmbeddedExtractor::class)
     ->name('full-page-extractor');
+

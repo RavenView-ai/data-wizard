@@ -19,6 +19,16 @@ class AutoExtractArtifactsListener
         /** @var File $file */
         $file = $event->media;
 
+        if (cache()->get("avoid-artifact-generation-for-bucket-{$model->id}")) {
+            return;
+        }
+
         GenerateArtifactJob::dispatch(bucket: $model, file: $file);
+    }
+
+
+    public static function avoidArtifactGenerationForBucket(ExtractionBucket $bucket): void
+    {
+        cache()->put("avoid-artifact-generation-for-bucket-{$bucket->id}", true, now()->addHour());
     }
 }

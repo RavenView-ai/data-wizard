@@ -6,6 +6,7 @@ use App\Models\ArtifactGenerationStatus;
 use App\Models\ExtractionBucket;
 use App\Models\File;
 use Illuminate\Bus\Queueable;
+use Illuminate\Bus\Batchable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
 use Illuminate\Queue\InteractsWithQueue;
@@ -19,7 +20,7 @@ use Mateffy\Magic\Extraction\Artifacts\DiskArtifact;
  */
 class GenerateArtifactJob implements ShouldQueue
 {
-    use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
+    use Batchable, Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public function __construct(protected ExtractionBucket $bucket, protected File $file) {}
 

@@ -473,4 +473,19 @@ class ExtractionRun extends Model
 
         $this->dispatchWebhook();
     }
+
+    /**
+     * A recreatable secret that's a hash of the run ID and the bucket ID, hased together with the app secret.
+     */
+    public function getRunSecret(): string
+    {
+        $parts = collect([
+            $this->id,
+            $this->bucket_id,
+            $this->saved_extractor_id,
+            hash('sha256', config('app.secret'))
+        ])->join(':');
+
+        return hash('sha256', $parts);
+    }
 }
